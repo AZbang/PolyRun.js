@@ -1,0 +1,26 @@
+{
+  "name": "poly_run",
+  "description": "Javascript library to visualize the effect of Delaunay triangulation",
+  "main": "dist/PolyRun.js",
+  "authors": [
+    "azbang"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "delaunay",
+    "effect",
+    "animation",
+    "lerp",
+    "polygon",
+    "polylow",
+    "triangulation"
+  ],
+  "homepage": "https://github.com/AZbang/PolyRun.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

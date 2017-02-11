@@ -5,14 +5,16 @@ const helper = require("./helper");
 class Point {
 	constructor(root, index) {
 		this.root = root;
+		this.index = index;
+		
 		this.ctx = root.ctx;
 		this.style = root.style;
 		
-		this.index = index;
+		this.x = root.vertices[index][0];
+		this.y = root.vertices[index][1];
+		this.id = root.vertices[index][2] || 0;
 
-		this.x = root.vertices[index][0]*root.zoom;
-		this.y = root.vertices[index][1]*root.zoom;
-		this.isSelect = root.vertices[index][2];
+		this.style = root.style[this.id] || {};
 
 		this.commons = [];
 		this.variants = [];
@@ -34,7 +36,9 @@ class Point {
 
 	update() {
 		if(this.isStart) {
-			if(helper.randRange(0, this.root.probabilityCreateAnimation) === 0) this.newLineAnimation();
+			if(helper.randRange(0, this.root.probability) === 0) 
+				this.newLineAnimation();
+
 			this.animation();
 		}
 	}
@@ -43,9 +47,8 @@ class Point {
 			if(this.dtCommons[i][2]) continue;
 
 			var dt = this.dtCommons[i];
-			var speed = Math.min(this.root.animationSpeed, 0.8);
-			dt[0].x = helper.lerp(dt[0].x, dt[1].x, speed);
-			dt[0].y = helper.lerp(dt[0].y, dt[1].y, speed);
+			dt[0].x = helper.lerp(dt[0].x, dt[1].x, this.root.speed);
+			dt[0].y = helper.lerp(dt[0].y, dt[1].y, this.root.speed);
 
 
 			if(helper.compare(dt[0].x, dt[1].x, 1) && helper.compare(dt[0].y, dt[1].y, 1)) {
@@ -58,9 +61,19 @@ class Point {
 	draw() {
 		if(!this.isStart) return;
 
+		if(this.id === 0) {
+			for(let key in this.root.style[0]) {
+				this.ctx[key] = this.root.style[0][key];
+			}
+		}
+
 		for(let i = 0; i < this.dtCommons.length; i++) {
-			this.ctx.strokeStyle = this.isSelect && this.dtCommons[i][1].isSelect ? this.style.colorActiveLine : this.style.colorLine;
-			this.ctx.lineWidth = this.style.lineWidth;
+
+			if(this.id !== 0 && this.id === this.dtCommons[i][1].id) {
+				for(let key in this.root.style[this.id]) {
+					this.ctx[key] = this.root.style[this.id][key];
+				}
+			}
 
 			this.ctx.beginPath();
 			this.ctx.moveTo(this.x, this.y);
@@ -69,9 +82,8 @@ class Point {
 		}
 		
 
-		if(this.style.isRenderPoint) {
-			this.ctx.fillStyle = this.style.colorPoint;
-			this.ctx.arc(this.x, this.y, this.style.radiusPoint || 2.5, 0, 2*Math.PI);
+		if(this.ctx.isRenderPoint) {
+			this.ctx.arc(this.x, this.y, this.ctx.radiusPoint || 2.5, 0, 2*Math.PI);
 			this.ctx.fill();
 		}
 	}

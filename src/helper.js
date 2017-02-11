@@ -14,8 +14,8 @@ var helper = {
 		if(isRound) return Math.floor(rand);
 		else return rand;
 	},
-	compare(a, b, err) {
-		return err ? a > b-err && a < b+err : a == b;
+	compare(a, b, e) {
+		return e ? a > b-e && a < b+e : a == b;
 	},
 
 	lerp(v0, v1, t) {
