@@ -1,6 +1,7 @@
 {
   "name": "poly_run",
   "description": "Javascript library to visualize the effect of Delaunay triangulation",
+  "version": "0.2.1",
   "main": "dist/PolyRun.js",
   "authors": [
     "azbang"

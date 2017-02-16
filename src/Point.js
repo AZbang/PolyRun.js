@@ -8,19 +8,23 @@ class Point {
 		this.index = index;
 		
 		this.ctx = root.ctx;
-		this.style = root.style;
 		
 		this.x = root.vertices[index][0];
 		this.y = root.vertices[index][1];
 		this.id = root.vertices[index][2] || 0;
 
-		this.style = root.style[this.id] || {};
+		this.style = root.render[this.id] || {};
 
 		this.commons = [];
 		this.variants = [];
 		this.dtCommons = [];
 
 		this.isStart = false;
+
+		this._tickerCounter = 0;
+
+		// helpers
+		this.animCounter = 0;
 	}
 	newLineAnimation() {
 		if(!this.commons.length) return;
@@ -36,13 +40,19 @@ class Point {
 
 	update() {
 		if(this.isStart) {
-			if(helper.randRange(0, this.root.probability) === 0) 
+			this._tickerCounter++;
+
+			if(this._tickerCounter >= this.root.probability) {
+				this._tickerCounter = 0;
 				this.newLineAnimation();
+			}
 
 			this.animation();
 		}
 	}
 	animation() {
+		this.animCounter = helper.lerp(this.animCounter, this.root.animCounterMax, this.root.animCounterSpeed);
+
 		for(let i = 0; i < this.dtCommons.length; i++) {
 			if(this.dtCommons[i][2]) continue;
 
@@ -61,31 +71,19 @@ class Point {
 	draw() {
 		if(!this.isStart) return;
 
-		if(this.id === 0) {
-			for(let key in this.root.style[0]) {
-				this.ctx[key] = this.root.style[0][key];
-			}
-		}
-
 		for(let i = 0; i < this.dtCommons.length; i++) {
-
-			if(this.id !== 0 && this.id === this.dtCommons[i][1].id) {
-				for(let key in this.root.style[this.id]) {
-					this.ctx[key] = this.root.style[this.id][key];
-				}
+			if(this.style.renderLine && this.id === this.dtCommons[i][1].id) {
+				this.style.renderLine(this, this.x, this.y, this.dtCommons[i][0].x, this.dtCommons[i][0].y);
+			} else {
+				this.ctx.beginPath();
+				this.ctx.moveTo(this.x, this.y);
+				this.ctx.lineTo(this.dtCommons[i][0].x, this.dtCommons[i][0].y);		
+				this.ctx.stroke();
 			}
-
-			this.ctx.beginPath();
-			this.ctx.moveTo(this.x, this.y);
-			this.ctx.lineTo(this.dtCommons[i][0].x, this.dtCommons[i][0].y, 0, 0, 2*Math.PI);		
-			this.ctx.stroke();
 		}
 		
-
-		if(this.ctx.isRenderPoint) {
-			this.ctx.arc(this.x, this.y, this.ctx.radiusPoint || 2.5, 0, 2*Math.PI);
-			this.ctx.fill();
-		}
+		if(this.style.renderPoint)
+			this.style.renderPoint(this, this.x, this.y);
 	}
 
 	resize() {	

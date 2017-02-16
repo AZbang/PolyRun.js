@@ -27,6 +27,15 @@ var helper = {
 			++i; if(arr[i] == val) return true;
 		}
 		return false;
+	},
+
+	is(v, a, b) {
+		if(b != null) return v != null ? a : b;
+		else return v != null ? v : a;
+	},
+	isObj(v, a, b) {
+		if(b != null) return typeof v === 'object' ? a : b;
+		else return typeof v === 'object' ? v : a;
 	}
 }
 

@@ -5,53 +5,55 @@ const Point = require("./Point");
 const helper = require("./helper");
 
 class PolyEffect {
-	constructor(config = {}) {
+	constructor(config) {
 		this.root = config.root;
 
-		this.parent = config.parent;
-		this.view = config.view;
-		this.ctx = this.view.getContext('2d');
+		this.parent 		  = config.parent;
+		this.view 			  = config.view;
+		this.ctx 			  = this.view.getContext('2d');
 
-		this.w = config.w || this.parent.offsetWidth;
-		this.h = config.h || this.parent.offsetHeight;
+		this.w 				  = helper.is(config.w, this.parent.offsetWidth);
+		this.h 				  = helper.is(config.h, this.parent.offsetHeight);
 
-		this.view.width = this.w;
-		this.view.height = this.h;
-		this.rootScale = config.rootScale || this.w;
-		this.zoom = this.w/this.rootScale;
+		this.view.width 	  = this.w;
+		this.view.height 	  = this.h;
+		this.rootScale 		  = config.rootScale || this.w;
+		this.zoom 			  = this.w/this.rootScale;
 		
+		this.render 		  = helper.is(config.render, {});
+
+		this.compress 		  = helper.is(config.compress, 6);
+		this.cell 			  = helper.is(config.cell, 100);
+
+		this.vertices 	  	  = helper.is(config.generate, this._generateVertices(), helper.is(config.vertices, []));
+		this.triangles 		  = delaunay.triangulate(this.vertices);
+
+		this.startPoint 	  = helper.is(config.startPoint, 0);
+		this.speed 			  = helper.is(config.speed, 0.1);
+		this.probability 	  = helper.is(config.probability, 10);
+		this.acceleration 	  = helper.is(config.acceleration, 0.001);
+
+		this.animCounterSpeed = helper.is(config.animCounterSpeed, 0);
+		this.animCounterMax	  = helper.is(config.animCounterMax, 0);
 
 
-
-		this.compress = config.compress || 6;
-		this.cell = config.cell || 100;
-		this.speed = config.speed || 0.1;
-		this.probability = config.probability || 10;
-		this.acceleration = config.acceleration || 0.001;
-		this.startPoint = config.startPoint || null;
-		this.style = config.style || {};
-
-
-		if(config.vertices)
-			this.vertices = config.vertices;
-		else this._generateVertices();
 		this.points = [];
-		this.triangles = [];
-
-		this._create();
-		this.startPoint != null && this.start();
+		this._createAnimation();
+		config.autoStart && this.start(this.startPoint);
 	}
 	_generateVertices() {
-		this.vertices = [];
+		let vertices = [];
 
 		for(let y = -1; y < Math.round(this.h/this.cell)+1; y++) {
 			for(let x = -1; x < Math.round(this.w/this.cell)+1; x++) {
 				let posY = helper.randRange(y*this.cell+this.cell/this.compress, (y+1)*this.cell-this.cell/this.compress);
 				let posX = helper.randRange(x*this.cell+this.cell/this.compress, (x+1)*this.cell-this.cell/this.compress);
 
-				this.vertices.push([posX, posY]);
+				vertices.push([posX, posY]);
 			}
 		}
+
+		return vertices;
 	}
 	_createPoints() {
 		var iterationsControl = 0;
@@ -91,13 +93,12 @@ class PolyEffect {
 		}
 	}
 
-	_create() {
-		this.triangles = delaunay.triangulate(this.vertices);
+	_createAnimation() {	
 		this._createPoints();
 		this._createPointLinks();
 	}
 	start(index) {
-		this.points[index || this.startPoint].start();
+		this.points[index || 0].start();
 	}
 
 	update() {

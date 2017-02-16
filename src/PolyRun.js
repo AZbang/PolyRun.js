@@ -10,6 +10,8 @@ var PolyRun = {
 
 		let eff = new PolyEffect(config);
 		this.effects[key] = eff;
+
+		return eff;
 	},
 	remove(key) {
 		delete this.effects[key];
