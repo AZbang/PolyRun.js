@@ -1,6 +1,6 @@
 {
   "name": "poly_run",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Javascript library to visualize the effect of Delaunay triangulation",
   "main": "src/index.js",
   "scripts": {

@@ -32,7 +32,7 @@ gulp.task('build', () => {
 			debug: isDev
 		}))
 		.pipe(
-			gulpIf(!isDev, 
+			gulpIf(!isDev,
 				babel({
 					presets: ['es2015']
 				})

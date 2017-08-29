@@ -8,33 +8,28 @@ class PolyEffect {
 	constructor(config) {
 		this.root = config.root;
 
-		this.parent 		  = config.parent;
-		this.view 			  = config.view;
-		this.ctx 			  = this.view.getContext('2d');
+		this.w = helper.is(config.w, 0);
+		this.h = helper.is(config.h, 0);
+		// this.rootScale = config.rootScale || this.w;
+		// this.zoom = this.w/this.rootScale;
+		this.zoom = 1;
 
-		this.w 				  = helper.is(config.w, this.parent.offsetWidth);
-		this.h 				  = helper.is(config.h, this.parent.offsetHeight);
+		this.render = helper.is(config.render, {});
+		this.clear = config.clear;
 
-		this.view.width 	  = this.w;
-		this.view.height 	  = this.h;
-		this.rootScale 		  = config.rootScale || this.w;
-		this.zoom 			  = this.w/this.rootScale;
-		
-		this.render 		  = helper.is(config.render, {});
+		this.compress = helper.is(config.compress, 6);
+		this.cell = helper.is(config.cell, 100);
 
-		this.compress 		  = helper.is(config.compress, 6);
-		this.cell 			  = helper.is(config.cell, 100);
+		this.vertices = helper.is(config.generate, this._generateVertices(), helper.is(config.vertices, []));
+		this.triangles = delaunay.triangulate(this.vertices);
 
-		this.vertices 	  	  = helper.is(config.generate, this._generateVertices(), helper.is(config.vertices, []));
-		this.triangles 		  = delaunay.triangulate(this.vertices);
-
-		this.startPoint 	  = helper.is(config.startPoint, 0);
-		this.speed 			  = helper.is(config.speed, 0.1);
-		this.probability 	  = helper.is(config.probability, 10);
-		this.acceleration 	  = helper.is(config.acceleration, 0.001);
+		this.startPoint = helper.is(config.startPoint, 0);
+		this.speed = helper.is(config.speed, 0.1);
+		this.probability = helper.is(config.probability, 10);
+		this.acceleration = helper.is(config.acceleration, 0.001);
 
 		this.animCounterSpeed = helper.is(config.animCounterSpeed, 0);
-		this.animCounterMax	  = helper.is(config.animCounterMax, 0);
+		this.animCounterMax = helper.is(config.animCounterMax, 0);
 
 
 		this.points = [];
@@ -93,7 +88,7 @@ class PolyEffect {
 		}
 	}
 
-	_createAnimation() {	
+	_createAnimation() {
 		this._createPoints();
 		this._createPointLinks();
 	}
@@ -102,15 +97,16 @@ class PolyEffect {
 	}
 
 	update() {
-		if(this.speed < 0.5) 
+		if(this.speed < 0.5)
 			this.speed += this.acceleration;
 
 		for(let i = this.points.length; i;) {
 			--i; this.points[i].update();
 		}
+		this.draw();
 	}
 	draw() {
-		this.ctx.clearRect(0, 0, this.w, this.h);
+		this.clear && this.clear(this);
 
 		for(let i = this.points.length; i;) {
 			--i; this.points[i].draw();

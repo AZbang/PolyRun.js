@@ -20,7 +20,6 @@ var PolyRun = {
 	update() {
 		for(let key in this.effects) {
 			this.effects[key].update();
-			this.effects[key].draw();
 		}
 	}
 };

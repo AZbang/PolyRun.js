@@ -6,15 +6,12 @@ class Point {
 	constructor(root, index) {
 		this.root = root;
 		this.index = index;
-		
-		this.ctx = root.ctx;
-		
+
 		this.x = root.vertices[index][0];
 		this.y = root.vertices[index][1];
 		this.id = root.vertices[index][2] || 0;
 
 		this.style = root.render[this.id] || {};
-
 		this.commons = [];
 		this.variants = [];
 		this.dtCommons = [];
@@ -74,19 +71,14 @@ class Point {
 		for(let i = 0; i < this.dtCommons.length; i++) {
 			if(this.style.renderLine && this.id === this.dtCommons[i][1].id) {
 				this.style.renderLine(this, this.x, this.y, this.dtCommons[i][0].x, this.dtCommons[i][0].y);
-			} else {
-				this.ctx.beginPath();
-				this.ctx.moveTo(this.x, this.y);
-				this.ctx.lineTo(this.dtCommons[i][0].x, this.dtCommons[i][0].y);		
-				this.ctx.stroke();
 			}
 		}
-		
+
 		if(this.style.renderPoint)
 			this.style.renderPoint(this, this.x, this.y);
 	}
 
-	resize() {	
+	resize() {
 		this.x = this.root.vertices[this.index][0]*this.root.zoom;
 		this.y = this.root.vertices[this.index][1]*this.root.zoom;
 	}
